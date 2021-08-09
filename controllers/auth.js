@@ -1,3 +1,4 @@
+const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const db = require("../models");
 const token = require("../token");
@@ -6,6 +7,10 @@ module.exports.login = async function (req, res) {
   const { email, password } = req.body;
 
   try {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json({ message: "Registration error" });
+    }
     const user = await db.User.findOne({ where: { email: email } });
     let userToken;
     if (!user) {
@@ -30,6 +35,10 @@ module.exports.register = async function (req, res) {
   const { name, email, dob, password } = req.body;
 
   try {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json({ message: "Registration error" });
+    }
     const candidat = await db.User.findOne({ where: { email: email } });
     if (candidat) {
       return res.status(400).json({ message: "Email already exists" });
@@ -55,7 +64,10 @@ module.exports.register = async function (req, res) {
 
 module.exports.getUsers = async (req, res) => {
   try {
-    const users = await db.User.findAll({ raw: true });
+    const users = await db.User.findAll({
+      raw: true,
+      attributes: ["id", "name", "email", "dob"],
+    });
     console.log(req.headers);
     if (!users) {
       res.status(404).json({

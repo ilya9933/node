@@ -1,4 +1,4 @@
-const tokenChek = require("./token");
+const tokenChek = require("../token");
 
 module.exports.tokenChecking = (req, res, next) => {
   const { token } = req.headers;
